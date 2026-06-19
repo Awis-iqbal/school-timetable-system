@@ -4,6 +4,7 @@ import API from "../api";
 function Teachers() {
   const [teachers, setTeachers] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [search, setSearch] = useState("");
 
   const [DepartmentID, setDepartmentID] = useState("");
   const [FirstName, setFirstName] = useState("");
@@ -53,77 +54,152 @@ function Teachers() {
     }
   };
 
-  return (
-    <div className="p-6">
-      <div className="bg-white p-6 rounded-2xl shadow">
+  const filteredTeachers = teachers.filter((teacher) =>
+    `${teacher.FirstName} ${teacher.LastName} ${teacher.Email} ${teacher.Phone} ${teacher.Qualification}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
 
-        <div className="flex justify-between mb-6">
-          <h1 className="text-3xl font-bold">Teachers</h1>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 p-6">
+      <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-8">
+
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-4xl font-extrabold text-slate-800">
+              Teachers
+            </h1>
+            <p className="text-slate-500 mt-1">
+              Manage all teacher records
+            </p>
+          </div>
 
           <button
             onClick={() => setShowForm(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-xl"
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
           >
-            Add Teacher
+            + Add Teacher
           </button>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {teachers.map((teacher) => (
+        {/* Search */}
+        <input
+          type="text"
+          placeholder="Search Teacher..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full border border-slate-300 p-4 rounded-2xl mb-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        {/* Cards */}
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
+          {filteredTeachers.map((teacher) => (
             <div
               key={teacher.TeacherID}
-              className="bg-slate-100 p-5 rounded-xl hover:shadow-lg transition"
+              className="relative overflow-hidden bg-white rounded-[30px] border border-slate-200 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
             >
-              <img
-                src={`https://i.pravatar.cc/150?img=${teacher.TeacherID}`}
-                alt=""
-                className="w-20 h-20 rounded-full mx-auto"
-              />
+              {/* Top Gradient */}
+              <div className="h-24 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
 
-              <h3 className="text-center font-bold mt-3">
-                {teacher.FirstName} {teacher.LastName}
-              </h3>
+              {/* Avatar */}
+              <div className="flex justify-center -mt-12">
+                <div className="bg-white p-1 rounded-full shadow-xl">
+                  <img
+                    src={`https://i.pravatar.cc/150?img=${teacher.TeacherID}`}
+                    alt=""
+                    className="w-28 h-28 rounded-full object-cover border-4 border-white"
+                  />
+                </div>
+              </div>
 
-              <p className="text-center text-gray-500">
-                {teacher.Qualification}
-              </p>
+              <div className="p-6">
+                {/* Name */}
+                <h3 className="text-center text-2xl font-bold text-slate-800">
+                  {teacher.FirstName} {teacher.LastName}
+                </h3>
 
-              <p className="text-center text-sm text-gray-400 mt-2">
-                {teacher.Email}
-              </p>
+                {/* Qualification */}
+                <div className="flex justify-center mt-3">
+                  <span className="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-semibold">
+                    {teacher.Qualification}
+                  </span>
+                </div>
 
-              <p className="text-center text-sm text-gray-400">
-                {teacher.Phone}
-              </p>
+                {/* Details */}
+                <div className="mt-6 space-y-4">
+                  <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                    <p className="text-xs text-slate-400 mb-1">Email</p>
+                    <p className="text-slate-700 font-medium break-all">
+                      {teacher.Email}
+                    </p>
+                  </div>
+
+                  <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                    <p className="text-xs text-slate-400 mb-1">Phone</p>
+                    <p className="text-slate-700 font-medium">
+                      {teacher.Phone}
+                    </p>
+                  </div>
+
+                  {/* IDs */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-blue-50 rounded-2xl p-4 text-center">
+                      <p className="text-xs text-slate-400">
+                        Teacher ID
+                      </p>
+                      <p className="text-xl font-bold text-blue-700">
+                        {teacher.TeacherID}
+                      </p>
+                    </div>
+
+                    <div className="bg-indigo-50 rounded-2xl p-4 text-center">
+                      <p className="text-xs text-slate-400">
+                        Dept ID
+                      </p>
+                      <p className="text-xl font-bold text-indigo-700">
+                        {teacher.DepartmentID}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
+
+          {filteredTeachers.length === 0 && (
+            <div className="col-span-full text-center py-10 text-slate-500">
+              No Teachers Found
+            </div>
+          )}
         </div>
 
+        {/* Modal */}
         {showForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
 
-            <div className="bg-white p-6 rounded-xl w-[450px]">
+            <div className="bg-white p-8 rounded-3xl w-[450px] shadow-2xl">
 
-              <h2 className="text-xl font-bold mb-4">
+              <h2 className="text-2xl font-bold mb-6 text-slate-800">
                 Add Teacher
               </h2>
 
               <input
-                className="border p-2 w-full mb-3"
+                className="border border-slate-300 p-3 w-full mb-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                 placeholder="Department ID"
                 value={DepartmentID}
                 onChange={(e) => setDepartmentID(e.target.value)}
               />
 
               <input
-                className="border p-2 w-full mb-3"
+                className="border border-slate-300 p-3 w-full mb-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                 placeholder="First Name"
                 value={FirstName}
                 onChange={(e) => setFirstName(e.target.value)}
               />
 
               <input
-                className="border p-2 w-full mb-3"
+                className="border border-slate-300 p-3 w-full mb-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                 placeholder="Last Name"
                 value={LastName}
                 onChange={(e) => setLastName(e.target.value)}
@@ -131,49 +207,46 @@ function Teachers() {
 
               <input
                 type="email"
-                className="border p-2 w-full mb-3"
+                className="border border-slate-300 p-3 w-full mb-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                 placeholder="Email"
                 value={Email}
                 onChange={(e) => setEmail(e.target.value)}
               />
 
               <input
-                className="border p-2 w-full mb-3"
+                className="border border-slate-300 p-3 w-full mb-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                 placeholder="Phone"
                 value={Phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
 
               <input
-                className="border p-2 w-full mb-3"
+                className="border border-slate-300 p-3 w-full mb-4 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                 placeholder="Qualification"
                 value={Qualification}
                 onChange={(e) => setQualification(e.target.value)}
               />
 
-              <div className="flex justify-between">
-
+              <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setShowForm(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  className="bg-slate-500 text-white px-5 py-2 rounded-xl hover:bg-slate-600"
                 >
                   Cancel
                 </button>
 
                 <button
                   onClick={saveTeacher}
-                  className="bg-green-600 text-white px-4 py-2 rounded"
+                  className="bg-green-600 text-white px-5 py-2 rounded-xl hover:bg-green-700"
                 >
                   Save
                 </button>
-
               </div>
 
             </div>
 
           </div>
         )}
-
       </div>
     </div>
   );

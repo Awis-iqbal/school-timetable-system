@@ -11,9 +11,19 @@ function Settings() {
   const getUser = async () => {
     try {
       const res = await API.get("/settings");
-      setUser(res.data);
+
+      setUser({
+        FullName: res.data?.FullName || "",
+        Email: res.data?.Email || "",
+        Password: res.data?.Password || "",
+      });
     } catch (error) {
-      console.log(error);
+      console.log("GET SETTINGS ERROR:", error.response?.data || error.message);
+      alert(
+        error.response?.data?.sqlMessage ||
+          error.response?.data?.message ||
+          "Failed to load settings"
+      );
     }
   };
 
@@ -22,7 +32,10 @@ function Settings() {
   }, []);
 
   const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+    setUser({
+      ...user,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const saveSettings = async () => {
@@ -30,21 +43,24 @@ function Settings() {
       await API.put("/settings", user);
       alert("Settings Updated Successfully");
     } catch (error) {
-      console.log(error);
-      alert("Failed to update settings");
+      console.log("PUT SETTINGS FULL ERROR:", error);
+      console.log("PUT SETTINGS BACKEND:", error.response?.data);
+
+      alert(
+        error.response?.data?.sqlMessage ||
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to update settings"
+      );
     }
   };
 
   return (
     <div className="p-6">
       <div className="bg-white p-6 rounded-2xl shadow max-w-2xl">
-
-        <h1 className="text-3xl font-bold mb-6">
-          Settings
-        </h1>
+        <h1 className="text-3xl font-bold mb-6">Settings</h1>
 
         <div className="space-y-4">
-
           <input
             type="text"
             name="FullName"
@@ -78,9 +94,7 @@ function Settings() {
           >
             Save Changes
           </button>
-
         </div>
-
       </div>
     </div>
   );
