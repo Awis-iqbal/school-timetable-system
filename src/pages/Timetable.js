@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import API from "../api";
 
 function Timetable() {
   const [schedules, setSchedules] = useState([]);
+  const [periods, setPeriods] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
   const [ClassID, setClassID] = useState("");
@@ -12,31 +13,47 @@ function Timetable() {
   const [PeriodID, setPeriodID] = useState("");
   const [DayOfWeek, setDayOfWeek] = useState("");
 
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-  const periods = [
-    { id: 1, time: "08:00 - 09:00" },
-    { id: 2, time: "09:00 - 10:00" },
-    { id: 3, time: "10:00 - 11:00" },
-    { id: 4, time: "11:00 - 12:00" },
-    { id: 5, time: "12:00 - 01:00" },
+  const days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
   ];
 
-  const getSchedules = async () => {
+  const getSchedules = useCallback(async () => {
     try {
       const res = await API.get("/schedules");
       setSchedules(res.data);
     } catch (error) {
       console.log("Error fetching schedules:", error);
     }
-  };
+  }, []);
+
+  const getPeriods = useCallback(async () => {
+    try {
+      const res = await API.get("/periods");
+      setPeriods(res.data);
+    } catch (error) {
+      console.log("Error fetching periods:", error);
+    }
+  }, []);
 
   useEffect(() => {
     getSchedules();
-  }, []);
+    getPeriods();
+  }, [getSchedules, getPeriods]);
 
   const saveSchedule = async () => {
-    if (!ClassID || !SubjectID || !TeacherID || !RoomID || !PeriodID || !DayOfWeek) {
+    if (
+      !ClassID ||
+      !SubjectID ||
+      !TeacherID ||
+      !RoomID ||
+      !PeriodID ||
+      !DayOfWeek
+    ) {
       alert("Please fill all fields");
       return;
     }
@@ -66,14 +83,25 @@ function Timetable() {
       console.log("Full Error:", error);
       console.log("Backend Error:", error.response?.data);
 
-      alert(error.response?.data?.sqlMessage || error.response?.data?.message || "Failed to Add Schedule");
+      alert(
+        error.response?.data?.sqlMessage ||
+          error.response?.data?.message ||
+          "Failed to Add Schedule"
+      );
     }
   };
 
   const getScheduleCell = (day, periodId) => {
     return schedules.find(
-      (item) => item.DayOfWeek === day && Number(item.PeriodID) === Number(periodId)
+      (item) =>
+        item.DayOfWeek === day &&
+        Number(item.PeriodID) === Number(periodId)
     );
+  };
+
+  const formatTime = (time) => {
+    if (!time) return "";
+    return String(time).slice(0, 5);
   };
 
   return (
@@ -102,11 +130,15 @@ function Timetable() {
             <thead>
               <tr className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
                 <th className="p-4">Day</th>
+
                 {periods.map((period) => (
-                  <th key={period.id} className="p-4 text-center">
-                    Period {period.id}
+                  <th key={period.PeriodID} className="p-4 text-center">
+                    {period.PeriodName}
                     <br />
-                    <span className="text-xs font-normal">{period.time}</span>
+                    <span className="text-xs font-normal">
+                      {formatTime(period.StartTime)} -{" "}
+                      {formatTime(period.EndTime)}
+                    </span>
                   </th>
                 ))}
               </tr>
@@ -120,18 +152,20 @@ function Timetable() {
                   </td>
 
                   {periods.map((period) => {
-                    const schedule = getScheduleCell(day, period.id);
+                    const schedule = getScheduleCell(day, period.PeriodID);
 
                     return (
-                      <td key={period.id} className="p-3 align-top">
+                      <td key={period.PeriodID} className="p-3 align-top">
                         {schedule ? (
                           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-3 shadow-sm">
                             <p className="font-bold text-blue-700">
-                              {schedule.SubjectName || `Subject ID: ${schedule.SubjectID}`}
+                              {schedule.SubjectName ||
+                                `Subject ID: ${schedule.SubjectID}`}
                             </p>
 
                             <p className="text-sm text-slate-600 mt-1">
-                              Teacher: {schedule.TeacherName || schedule.TeacherID}
+                              Teacher:{" "}
+                              {schedule.TeacherName || schedule.TeacherID}
                             </p>
 
                             <p className="text-sm text-slate-600">
@@ -152,6 +186,14 @@ function Timetable() {
                   })}
                 </tr>
               ))}
+
+              {periods.length === 0 && (
+                <tr>
+                  <td className="p-8 text-center text-slate-500">
+                    No periods found. Add periods from Timetable Management.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -202,8 +244,9 @@ function Timetable() {
               >
                 <option value="">Select Period</option>
                 {periods.map((period) => (
-                  <option key={period.id} value={period.id}>
-                    Period {period.id} - {period.time}
+                  <option key={period.PeriodID} value={period.PeriodID}>
+                    {period.PeriodName} ({formatTime(period.StartTime)} -{" "}
+                    {formatTime(period.EndTime)})
                   </option>
                 ))}
               </select>

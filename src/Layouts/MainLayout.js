@@ -16,6 +16,9 @@ import Events from "../pages/Events";
 import Holidays from "../pages/Holidays";
 import Notifications from "../pages/Notifications";
 import Settings from "../pages/Settings";
+import ClassroomAvailability from "../pages/ClassroomAvailability";
+import Staff from "../pages/Staff";
+import TimetableManagement from "../pages/TimetableManagement";
 
 function MainLayout() {
   return (
@@ -28,18 +31,28 @@ function MainLayout() {
         <div className="p-6">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/Students" element={<Students />} />
-            <Route path="/Teachers" element={<Teachers />} />
-            <Route path="/Classes" element={<Classes />} />
-            <Route path="/Subjects" element={<Subjects />} />
-            <Route path="/Rooms" element={<Rooms />} />
-            <Route path="/Timetable" element={<Timetable />} />
-            <Route path="/Attendance" element={<Attendance />} />
-            <Route path="/Exams" element={<Exams />} />
-            <Route path="/Events" element={<Events />} />
-            <Route path="/Holidays" element={<Holidays />} />
-            <Route path="/Notifications" element={<Notifications />} />
-            <Route path="/Settings" element={<Settings />} />
+
+            <Route path="/students" element={<Students />} />
+            <Route path="/teachers" element={<Teachers />} />
+            <Route path="/classes" element={<Classes />} />
+            <Route path="/subjects" element={<Subjects />} />
+            <Route path="/rooms" element={<Rooms />} />
+            <Route
+              path="/classroomavailability"
+              element={<ClassroomAvailability />}
+            />
+            <Route path="/staff" element={<Staff />} />
+            <Route path="/timetable" element={<Timetable />} />
+            <Route
+              path="/timetable-management"
+              element={<TimetableManagement />}
+            />
+            <Route path="/attendance" element={<Attendance />} />
+            <Route path="/exams" element={<Exams />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/holidays" element={<Holidays />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </div>
       </div>
