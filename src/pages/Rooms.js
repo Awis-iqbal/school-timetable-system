@@ -4,6 +4,7 @@ import API from "../api";
 function Rooms() {
   const [rooms, setRooms] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [RoomNumber, setRoomNumber] = useState("");
   const [Capacity, setCapacity] = useState("");
@@ -23,6 +24,11 @@ function Rooms() {
   }, []);
 
   const saveRoom = async () => {
+    if (!RoomNumber || !Capacity || !RoomType) {
+      alert("Please fill all fields");
+      return;
+    }
+
     try {
       await API.post("/rooms", {
         RoomNumber,
@@ -30,12 +36,15 @@ function Rooms() {
         RoomType,
       });
 
-      alert("Room Added Successfully");
-
       setRoomNumber("");
       setCapacity("");
       setRoomType("");
       setShowForm(false);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 2000);
 
       getRooms();
     } catch (error) {
@@ -164,6 +173,24 @@ function Rooms() {
                   Save
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {showSuccess && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-[60]">
+            <div className="bg-white w-[520px] rounded-2xl shadow-2xl p-10 text-center">
+              <div className="w-28 h-28 mx-auto rounded-full border-4 border-green-100 flex items-center justify-center mb-6">
+                <span className="text-green-400 text-6xl">✓</span>
+              </div>
+
+              <h2 className="text-4xl font-bold text-slate-700 mb-5">
+                Added!
+              </h2>
+
+              <p className="text-xl text-slate-500">
+                Room Added Successfully
+              </p>
             </div>
           </div>
         )}

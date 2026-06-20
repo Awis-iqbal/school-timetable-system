@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   FaHome,
   FaUserGraduate,
@@ -14,9 +16,11 @@ import {
   FaUsers,
 } from "react-icons/fa";
 
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function Sidebar() {
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+
   const menuItems = [
     { name: "Dashboard", path: "/", icon: <FaHome /> },
     { name: "Students", path: "/students", icon: <FaUserGraduate /> },
@@ -54,12 +58,27 @@ function Sidebar() {
 
       <ul className="mt-6 px-3 space-y-2 pb-8">
         {menuItems.map((item, index) => (
-          <Link key={index} to={item.path}>
-            <li className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-600 transition-all duration-300 cursor-pointer">
-              <span>{item.icon}</span>
-              <span>{item.name}</span>
-            </li>
-          </Link>
+          <NavLink key={index} to={item.path} end={item.path === "/"}>
+            {({ isActive }) => {
+              const showBlue =
+                hoveredIndex !== null
+                  ? hoveredIndex === index
+                  : isActive;
+
+              return (
+                <li
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 cursor-pointer ${
+                    showBlue ? "bg-blue-600 text-white" : ""
+                  }`}
+                >
+                  <span>{item.icon}</span>
+                  <span>{item.name}</span>
+                </li>
+              );
+            }}
+          </NavLink>
         ))}
       </ul>
     </div>

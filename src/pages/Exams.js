@@ -4,6 +4,7 @@ import API from "../api";
 function Exams() {
   const [exams, setExams] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [search, setSearch] = useState("");
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -41,13 +42,16 @@ function Exams() {
         TotalMarks,
       });
 
-      alert("Exam Added Successfully");
-
       setSubjectID("");
       setExamName("");
       setExamDate("");
       setTotalMarks("");
       setShowForm(false);
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 2000);
 
       getExams();
     } catch (error) {
@@ -76,11 +80,12 @@ function Exams() {
     }
   };
 
-  const filteredExams = exams.filter((exam) =>
-    exam.ExamName?.toLowerCase().includes(search.toLowerCase()) ||
-    String(exam.ExamID).includes(search) ||
-    String(exam.SubjectID).includes(search) ||
-    String(exam.TotalMarks).includes(search)
+  const filteredExams = exams.filter(
+    (exam) =>
+      exam.ExamName?.toLowerCase().includes(search.toLowerCase()) ||
+      String(exam.ExamID).includes(search) ||
+      String(exam.SubjectID).includes(search) ||
+      String(exam.TotalMarks).includes(search)
   );
 
   return (
@@ -138,9 +143,7 @@ function Exams() {
                       {exam.ExamID}
                     </td>
 
-                    <td className="p-4 text-slate-600">
-                      {exam.SubjectID}
-                    </td>
+                    <td className="p-4 text-slate-600">{exam.SubjectID}</td>
 
                     <td className="p-4 font-bold text-slate-800">
                       {exam.ExamName}
@@ -238,6 +241,24 @@ function Exams() {
                   Save
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {showSuccess && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-[60]">
+            <div className="bg-white w-[520px] rounded-2xl shadow-2xl p-10 text-center">
+              <div className="w-28 h-28 mx-auto rounded-full border-4 border-green-100 flex items-center justify-center mb-6">
+                <span className="text-green-400 text-6xl">✓</span>
+              </div>
+
+              <h2 className="text-4xl font-bold text-slate-700 mb-5">
+                Added!
+              </h2>
+
+              <p className="text-xl text-slate-500">
+                Exam Added Successfully
+              </p>
             </div>
           </div>
         )}
